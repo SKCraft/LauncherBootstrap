@@ -8,9 +8,12 @@ package com.skcraft.launcher.bootstrap;
 
 import com.skcraft.launcher.Bootstrap;
 import lombok.extern.java.Log;
+import org.json.simple.JSONObject;
+import org.json.simple.JSONValue;
 
 import javax.swing.*;
 import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -60,16 +63,33 @@ public class Downloader implements Runnable, ProgressObservable {
 
         File finalFile = new File(bootstrap.getBinariesDir(), System.currentTimeMillis() + ".jar.pack");
         File tempFile = new File(finalFile.getParentFile(), finalFile.getName() + ".tmp");
+        URL updateUrl = HttpRequest.url(bootstrap.getProperties().getProperty("latestUrl"));
+
+        log.info("Reading update URL " + updateUrl + "...");
 
         try {
-            String rawUrl = HttpRequest
-                    .get(HttpRequest.url(bootstrap.getProperties().getProperty("latestUrl")))
+            String data = HttpRequest
+                    .get(updateUrl)
                     .execute()
                     .expectResponseCode(200)
                     .returnContent()
                     .asString("UTF-8");
 
-            URL url = HttpRequest.url(rawUrl.trim());
+            Object object = JSONValue.parse(data);
+            URL url;
+
+            if (object instanceof JSONObject) {
+                String rawUrl = String.valueOf(((JSONObject) object).get("url"));
+                if (rawUrl != null) {
+                    url = HttpRequest.url(rawUrl.trim());
+                } else {
+                    log.warning("Did not get valid update document - got:\n\n" + data);
+                    throw new IOException("Update URL did not return a valid result");
+                }
+            } else {
+                log.warning("Did not get valid update document - got:\n\n" + data);
+                throw new IOException("Update URL did not return a valid result");
+            }
 
             checkInterrupted();
 
