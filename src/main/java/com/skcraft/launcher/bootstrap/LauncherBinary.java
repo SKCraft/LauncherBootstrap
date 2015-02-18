@@ -43,7 +43,7 @@ public class LauncherBinary implements Comparable<LauncherBinary> {
             log.log(Level.INFO, "Need to unpack " + path.getAbsolutePath());
 
             String packName = path.getName();
-            File outputPath = new File(path.getParentFile(), packName.substring(0, packName.length() - 4));
+            File outputPath = new File(path.getParentFile(), packName.substring(0, packName.length() - 5));
 
             if (outputPath.exists()) {
                 return outputPath;
