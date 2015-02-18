@@ -48,6 +48,12 @@ While in the same directory as this document, run the following in terminal or c
 
 In the `target/` folder should be the resulting files.
 
+If you want to generate .exe (for Windows) and .app files (for Mac OS X), compile using the following command:
+
+	mvn -Pplatform-specific clean package 
+
+**WARNING:** If the path that you have the bootstrap project in has space characters, this may fail.
+
 ## License
 
 The launcher is licensed under the GNU General Public License, version 3.
