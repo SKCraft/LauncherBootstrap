@@ -23,6 +23,8 @@ import java.net.URLClassLoader;
 import java.util.*;
 import java.util.logging.Level;
 
+import static com.skcraft.launcher.bootstrap.SharedLocale._;
+
 @Log
 public class Bootstrap {
 
@@ -36,28 +38,30 @@ public class Bootstrap {
 
     public static void main(String[] args) throws Throwable {
         SimpleLogFormatter.configureGlobalLogger();
+        SharedLocale.loadBundle("com.skcraft.launcher.lang.Bootstrap", Locale.getDefault());
 
         boolean portable = isPortableMode();
-        File baseDir = portable ? new File(".") : getUserLauncherDir();
 
-        Bootstrap bootstrap = new Bootstrap(baseDir, portable, args);
+        Bootstrap bootstrap = new Bootstrap(portable, args);
         try {
             bootstrap.cleanup();
             bootstrap.launch();
         } catch (Throwable t) {
             Bootstrap.log.log(Level.WARNING, "Error", t);
             Bootstrap.setSwingLookAndFeel();
-            SwingHelper.showErrorDialog(null, "An error occurred while trying to bootstrap the launcher!", "Error", t);
+            SwingHelper.showErrorDialog(null, _("errors.bootstrapError"), _("errorTitle"), t);
         }
     }
 
-    public Bootstrap(File baseDir, boolean portable, String[] args) throws IOException {
+    public Bootstrap(boolean portable, String[] args) throws IOException {
+        this.properties = BootstrapUtils.loadProperties(Bootstrap.class, "bootstrap.properties");
+
+        File baseDir = portable ? new File(".") : getUserLauncherDir();
+
         this.baseDir = baseDir;
         this.portable = portable;
         this.binariesDir = new File(baseDir, "launcher");
         this.originalArgs = args;
-
-        this.properties = BootstrapUtils.loadProperties(Bootstrap.class, "bootstrap.properties");
 
         binariesDir.mkdirs();
     }
@@ -169,7 +173,7 @@ public class Bootstrap {
     public Class<?> load(File jarFile) throws MalformedURLException, ClassNotFoundException {
         URL[] urls = new URL[] { jarFile.toURI().toURL() };
         URLClassLoader child = new URLClassLoader(urls, this.getClass().getClassLoader());
-        Class<?> clazz = Class.forName("com.skcraft.launcher.Launcher", true, child);
+        Class<?> clazz = Class.forName(getProperties().getProperty("launcherClass"), true, child);
         return clazz;
     }
 
@@ -186,12 +190,12 @@ public class Bootstrap {
         return fsv.getDefaultDirectory();
     }
 
-    private static File getUserLauncherDir() {
+    private File getUserLauncherDir() {
         String osName = System.getProperty("os.name").toLowerCase();
         if (osName.contains("win")) {
-            return new File(getFileChooseDefaultDir(), "SKCraft Launcher");
+            return new File(getFileChooseDefaultDir(), getProperties().getProperty("homeFolderWindows"));
         } else {
-            return new File(System.getProperty("user.home"), ".skcraftlauncher");
+            return new File(System.getProperty("user.home"), getProperties().getProperty("homeFolder"));
         }
     }
 

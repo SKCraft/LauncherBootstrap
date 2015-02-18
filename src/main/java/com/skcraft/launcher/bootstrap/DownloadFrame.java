@@ -18,6 +18,8 @@ import java.awt.event.WindowEvent;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import static com.skcraft.launcher.bootstrap.SharedLocale._;
+
 @Log
 public class DownloadFrame extends JFrame {
 
@@ -29,13 +31,13 @@ public class DownloadFrame extends JFrame {
     private final JPanel textAreaPanel = new JPanel(new BorderLayout());
     private final JProgressBar progressBar = new JProgressBar();
     private final LinedBoxPanel buttonsPanel = new LinedBoxPanel(true);
-    private final JButton cancelButton = new JButton("Cancel");
+    private final JButton cancelButton = new JButton(_("button.cancal"));
 
     public DownloadFrame(ProgressObservable observable) {
-        super("Downloading SKCraft Launcher...");
+        super(_("downloader.title"));
         setResizable(false);
         initComponents();
-        label.setText("Please wait...");
+        label.setText(_("downloader.pleaseWait"));
         setMinimumSize(new Dimension(400, 100));
         pack();
         setLocationRelativeTo(null);
@@ -85,7 +87,7 @@ public class DownloadFrame extends JFrame {
     }
 
     private boolean confirmCancel() {
-        return SwingHelper.confirmDialog(this, "Are you sure that you wish to cancel?", "Cancel");
+        return SwingHelper.confirmDialog(this, _("progress.confirmCancel"), _("progress.confirmCancelTitle"));
     }
 
     private void cancel() {
@@ -136,7 +138,7 @@ public class DownloadFrame extends JFrame {
                             progressBar.setValue((int) (1000 * progress));
                         }
                     } else {
-                        label.setText("Please wait...");
+                        label.setText(_("downloader.pleaseWait"));
                         progressBar.setIndeterminate(true);
                     }
                 }

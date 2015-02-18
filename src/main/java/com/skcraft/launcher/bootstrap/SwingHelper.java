@@ -22,6 +22,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static com.skcraft.launcher.bootstrap.BootstrapUtils.closeQuietly;
+import static com.skcraft.launcher.bootstrap.SharedLocale._;
 
 /**
  * Swing utility methods.
@@ -113,7 +114,7 @@ public final class SwingHelper {
 
             // Add the extra details
             if (detailsText != null) {
-                JTextArea textArea = new JTextArea("To report this error, provide:\n\n" + detailsText);
+                JTextArea textArea = new JTextArea(_("errorDialog.reportError") + "\n\n" + detailsText);
                 JLabel tempLabel = new JLabel();
                 textArea.setFont(tempLabel.getFont());
                 textArea.setBackground(tempLabel.getBackground());

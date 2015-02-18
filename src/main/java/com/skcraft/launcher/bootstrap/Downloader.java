@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.logging.Level;
 
 import static com.skcraft.launcher.bootstrap.BootstrapUtils.checkInterrupted;
+import static com.skcraft.launcher.bootstrap.SharedLocale._;
 
 @Log
 public class Downloader implements Runnable, ProgressObservable {
@@ -41,7 +42,7 @@ public class Downloader implements Runnable, ProgressObservable {
             System.exit(0);
         } catch (Throwable t) {
             log.log(Level.WARNING, "Failed to download launcher", t);
-            SwingHelper.showErrorDialog(null, "The SKCraft launcher could not be downloaded.", "Error", t);
+            SwingHelper.showErrorDialog(null, _("errors.failedDownloadError"), _("errorTitle"), t);
             System.exit(0);
         }
     }
@@ -107,11 +108,11 @@ public class Downloader implements Runnable, ProgressObservable {
         if (httpRequest != null) {
             double progress = httpRequest.getProgress();
             if (progress >= 0) {
-                return String.format("Downloading latest SKCraft Launcher (%.2f%%)...", progress * 100);
+                return String.format(_("downloader.progressStatus"), progress * 100);
             }
         }
 
-        return "Downloading latest SKCraft Launcher...";
+        return _("downloader.status");
     }
 
     @Override
